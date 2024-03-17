@@ -11,7 +11,7 @@ author: Gregory Lent
 
 **Global Historical Climatology Network Weather Data**
 
-In the United States, an organization called the Global Historical Climatology Network (GHCN) maintains over 100,000 weather stations. These stations record daily statistics like maximum/minimum temperature, precipitation amounts, snow levels, and more. This data is made freely available to the public. This is an incredible resource both for researchers, business owners, and other people who would like to use the data for professional purposes, and also for hobbyists who are interested in things like comparing rainfall or temperature between years. For example, if you have exceptional rainfall in your area, it can be fun to check how it stacks up against other historically large storms! 
+In the United States, an organization called the Global Historical Climatology Network (GHCN) maintains over 100,000 weather stations. These stations record daily statistics like maximum/minimum temperature, precipitation amounts, snow levels, and more. This data is made freely available to the public. This is an incredible resource not only for researchers, business owners, and other people who would like to use the data for professional purposes, and also for hobbyists who are interested in things like comparing rainfall or temperature between years. For example, if you have exceptional rainfall in your area, it can be fun to check how it stacks up against other historically large storms! 
 
 Unfortunately, however, the data looks like this: 
 
@@ -61,7 +61,7 @@ This expression will allow us to filter out dots that are not relevant to our in
 
 ![denver-2](https://Green9090.github.io/assets/img/denver-2.png){: .mx-auto.d-block :}
 
-Notice that all but one blue dot has now been greyed out; this means that they do not fit my search criteria. Let's click on the dot to get some information about it. 
+Notice that all but one blue dot has now been greyed out; this means that they do not fit my search criteria. Let's click on the remaining blue dot to get some information about it. 
 
 ![station-1](https://Green9090.github.io/assets/img/station-1.png){: .mx-auto.d-block :}
 
@@ -75,7 +75,7 @@ In this example, my station ID is "USC00052223." We'll use this in the next step
 
 **Downloading and Unpacking the Station Data**
 
-Now that we have a station we're interested in, it's time to track down the data file. We'll be using NOAA's (National Oceanic and Atmospheric Administration) [daily weather database](https://www.ncei.noaa.gov/pub/data/ghcn/daily/by_station/). This website is a list of all of the daily station data NOAA provides, one file for each station. Press Control+F on your keyboard to bring up a search box, and copy the station ID you're interested in into the box. You may need to wait a moment for your browser to locate the right file (this is a LONG list), but after a few moments you should be taken to a link to the data file you want. In my case, I'm downloading the file [USC00052223.csv.gz](https://www.ncei.noaa.gov/pub/data/ghcn/daily/by_station/USC00052223.csv.gz).
+Now that we have a station we're interested in, it's time to track down the data file. We'll be using NOAA's (National Oceanic and Atmospheric Administration) [daily weather database](https://www.ncei.noaa.gov/pub/data/ghcn/daily/by_station/). This website is a list of all of the daily station data NOAA provides, one file for each station. Press Control+F on your keyboard to bring up a search box, and copy the station ID you're interested in into the box. You may need to wait longer than you expect for your browser to locate the right file (this is a LONG list), but after a few moments you should be taken to a link to the data file you want. In my case, I'm downloading the file [USC00052223.csv.gz](https://www.ncei.noaa.gov/pub/data/ghcn/daily/by_station/USC00052223.csv.gz).
 
 The next step is to unpack this file. I found that the native Windows unzipping program was not capable of opening this .gz file for some reason. The free, open source unzipping program [7-zip](https://www.7-zip.org/download.html) is a good way to open these if you don't already have a program that can manage it. Once you have the file open, click the extract button on 7-zip (or any other unzipping software) to take the .csv file out of the archive. 
 
@@ -83,13 +83,13 @@ Once you have the file, you can open it in a text editor like notepad or a sprea
 
 **How the Data is Formatted**
 
+The source of the information presented in this section is the [readme file](https://www.ncei.noaa.gov/pub/data/ghcn/daily/readme.txt) provided by GHCN; if you have any questions about the data not answered here, you can refer to the readme. 
+
 Let's look at a line of this data file:
 
 ~~~
 USC00052223,19980125,TMIN,-6,,I,0,0800
 ~~~
-
-The source of the information presented in this section is the [readme file](https://www.ncei.noaa.gov/pub/data/ghcn/daily/readme.txt) provided by GHCN; if you have any questions about the data not answered here, you can refer to the readme. 
 
 Notice that now we can tell that the first column of the data is the station ID. This is going to be the same 11 characters repeated on each line of the data file.
 
@@ -111,7 +111,7 @@ The last column of the dataset is the time of observation in HHMM format (milita
 
 **Converting the Data into a Pandas DataFrame**
 
-Now that we understand how the data is structured, we can use software to convert it into something a little more useful. Notice that the data is in what's called narrow form, or long form. If you look closely, you will see that you have multiple rows for each date, each one with a different entry in the element column to distinguish them from one another. For analysis and general readability, we typically prefer data to be in a wide form, with one row per date and columns corresponding to the different kinds of measurements taken on that date. Here's a Python function to accomplish this with precipitation, snow, snow depth, and min/max temperature:
+Now that we understand how the data is structured, we can use software to convert it into something a little more useful. Notice that the data is in what's called narrow form, or long form. If you look closely, you will see that you have multiple rows for each date, each one with a different entry in the element column to distinguish them from one another. For analysis and general readability, we typically prefer data to be in a wide form, with one row per date and columns corresponding to the different kinds of measurements taken on that date. We also would like our numbers to be consistent and readable; in this case I chose to convert all measurements to inches or degrees Fahrenheit and stored dates as Python Datetime objects. Here's a Python function to accomplish this with precipitation, snow, snow depth, and min/max temperature:
 
 {% highlight python linenos %}
 import pandas as pd
@@ -126,8 +126,9 @@ def import_weather_data(path):
 
     df = df.pivot(index='date', columns='element', values='measurement')
     df = df.reset_index().rename(columns={'index': 'date'})
-    df['date'] = pd.to_datetime(df['date'])
-    df = df[[x for x in ['date', 'PRCP','SNOW','SNWD','TMAX','TMIN'] and df.columns]]
+    df.columns.name = None
+
+    df = df[[column for column in df.columns if column in ['date', 'PRCP','SNOW','SNWD','TMAX','TMIN']]]
 
     # temperatures are recorded in tenths of a degree Celsius, so t/10 is in Celsius, and C*(9/5) + 32 gives Fahrenheit
     if 'TMAX' in df.columns:
@@ -145,3 +146,71 @@ def import_weather_data(path):
 
     return df
 {% endhighlight %}
+
+
+Now we can run this function by giving it a file path to a GHCN data file: 
+
+{% highlight python linenos %}
+df = import_weather_data('E:/Coding/Python/Weather/USC00052223.csv')
+print(df.head())
+{% endhighlight %}
+
+Make sure you change the file path to the location on your own computer where you saved the .csv file we extracted earlier. 
+
+Our output should look something like this:
+
+~~~
+        date  PRCP  SNOW  SNWD   TMAX   TMIN
+0 1997-11-01   0.0   0.0   0.0  62.96  37.04
+1 1997-11-02   0.0   0.0   0.0  51.98  33.98
+2 1997-11-03   0.0   0.0   0.0  53.06  28.04
+3 1997-11-04   0.0   0.0   0.0  68.00  33.08
+4 1997-11-05   0.0   0.0   0.0  66.92  32.00
+~~~
+
+Much better! Now we have the data in a readable and usable format.
+
+## Visualizing the Data
+
+This dataframe is much easier to read than the original file, but it's still pretty hard to draw any conclusions from it. Let's look at a graph of the daily rainfall in Denver.
+
+{% highlight python linenos %}
+from matplotlib import pyplot as plt
+
+plt.plot(df['date'], df['PRCP'])
+plt.xlim(min(df['date']), max(df['date']))
+
+plt.title("Denver, Colorado Precipitation History")
+plt.xlabel("Date")
+plt.ylabel("Rainfall in inches")
+
+plt.show()
+{% endhighlight %}
+
+![Denver-daily-rainfall](https://Green9090.github.io/assets/img/Denver-daily-rainfall.png){: .mx-auto.d-block :}
+
+This is nice if we are interested in picking out particular storms with a lot of rainfall, or general periods with high or low rainfall. On the other hand, we might be interested in general rainfall trends, which are hard to read from this graph. Let's look at a graph of total rainfall by year instead. 
+
+{% highlight python linenos %}
+df['year'] = df['date'].dt.year
+yearly_rainfall_df = df.groupby('year')['PRCP'].sum().reset_index()
+yearly_rainfall_df.columns = ['year', 'rainfall']
+yearly_rainfall_df = yearly_rainfall_df.iloc[1:-1, :]
+
+
+plt.plot(yearly_rainfall_df['year'], yearly_rainfall_df['rainfall'])
+plt.xlim(min(yearly_rainfall_df['year']), max(yearly_rainfall_df['year']))
+
+plt.title("Denver, Colorado Yearly Precipitation History")
+plt.xlabel("Year")
+plt.ylabel("Total Annual Rainfall in Inches")
+
+plt.show()
+{% endhighlight %}
+
+This code makes a new DataFrame with a column for year and a column for total rainfall in that year, then makes a new plot using this DataFrame. 
+
+![Denver-annual-rainfall](https://Green9090.github.io/assets/img/Denver-annual-rainfall.png){: .mx-auto.d-block :}
+
+While this smooths a lot of information out of our graph, it's also much easier to read! We can now quickly identify that 2015 was the rainiest year on record, and 2010 was the driest. 
+
