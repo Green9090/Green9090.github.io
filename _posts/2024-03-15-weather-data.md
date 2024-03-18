@@ -2,7 +2,7 @@
 layout: post
 title: How Anyone Can Download and Use Historical Weather Data in Python's Pandas Library
 subtitle: There's a wealth of data out there for anyone who understands how to access it!
-cover-img: /assets/img/rain.png
+cover-img: /assets/img/rain.jpg
 gh-repo: daattali/beautiful-jekyll
 gh-badge: []
 tags: []
