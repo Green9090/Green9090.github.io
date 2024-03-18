@@ -2,6 +2,7 @@
 layout: post
 title: How Anyone Can Download and Use Historical Weather Data in Python's Pandas Library
 subtitle: There's a wealth of data out there for anyone who understands how to access it!
+cover-img: /assets/img/rain.png
 gh-repo: daattali/beautiful-jekyll
 gh-badge: []
 tags: []
@@ -9,7 +10,7 @@ comments: true
 author: Gregory Lent
 ---
 
-**Global Historical Climatology Network Weather Data**
+## Global Historical Climatology Network Weather Data
 
 In the United States, an organization called the Global Historical Climatology Network (GHCN) maintains over 100,000 weather stations. These stations record daily statistics like maximum/minimum temperature, precipitation amounts, snow levels, and more. This data is made freely available to the public. This is an incredible resource not only for researchers, business owners, and other people who would like to use the data for professional purposes, and also for hobbyists who are interested in things like comparing rainfall or temperature between years. For example, if you have exceptional rainfall in your area, it can be fun to check how it stacks up against other historically large storms! 
 
@@ -109,7 +110,7 @@ Finally, we have the SFLAG, or source flag. Unlike the other two flags, this is 
 
 The last column of the dataset is the time of observation in HHMM format (military time). In this case, the temperature was recorded at 8:00 am.  
 
-**Converting the Data into a Pandas DataFrame**
+## Converting the Data into a Pandas DataFrame
 
 Now that we understand how the data is structured, we can use software to convert it into something a little more useful. Notice that the data is in what's called narrow form, or long form. If you look closely, you will see that you have multiple rows for each date, each one with a different entry in the element column to distinguish them from one another. For analysis and general readability, we typically prefer data to be in a wide form, with one row per date and columns corresponding to the different kinds of measurements taken on that date. We also would like our numbers to be consistent and readable; in this case I chose to convert all measurements to inches or degrees Fahrenheit and stored dates as Python Datetime objects. Here's a Python function to accomplish this with precipitation, snow, snow depth, and min/max temperature:
 
@@ -170,7 +171,7 @@ Our output should look something like this:
 
 Much better! Now we have the data in a readable and usable format.
 
-## Visualizing the Data
+**Visualizing the Data**
 
 This dataframe is much easier to read than the original file, but it's still pretty hard to draw any conclusions from it. Let's look at a graph of the daily rainfall in Denver.
 
@@ -208,7 +209,7 @@ plt.ylabel("Total Annual Rainfall in Inches")
 plt.show()
 {% endhighlight %}
 
-This code makes a new DataFrame with a column for year and a column for total rainfall in that year, then makes a new plot using this DataFrame. 
+This code makes a new DataFrame with a column for year and a column for total rainfall in that year, then makes a new plot using this DataFrame. Note that we removed the first and last years from the data since they don't represent a full year of rainfall, so they can't be compared meaningfully to the other years.
 
 ![Denver-annual-rainfall](https://Green9090.github.io/assets/img/Denver-annual-rainfall.png){: .mx-auto.d-block :}
 

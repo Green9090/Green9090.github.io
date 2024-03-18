@@ -1,16 +1,7 @@
 ---
 layout: page
 title: About me
-subtitle: Why you'd want to go on a date with me
+subtitle: 
 ---
 
-My name is Inigo Montoya. I have the following qualities:
-
-- I rock a great mustache
-- I'm extremely loyal to my family
-
-What else do you need?
-
-### My story
-
-To be honest, I'm having some trouble remembering right now, so why don't you just watch [my movie](https://en.wikipedia.org/wiki/The_Princess_Bride_%28film%29) and it will answer **all** your questions.
+My name is Gregory Lent, and I am a statistics, mathematics, and programming nerd. I have a B.S. in Applied Statistics from California State University, Long Beach. I currently work as a college math tutor, and am looking to break into the Data Science field! I love to find ways to apply my skills to the real world, and this blog is my way to share what I find.
